@@ -12,6 +12,41 @@ query = st.text_input("Search Query", "restaurants in New York")
 max_depth = st.number_input("Maximum Scroll Depth", min_value=1, value=10)
 lang_code = st.text_input("Language Code", "en")
 
+st.sidebar.title("Deployment Tools (For Testing)")
+
+if st.sidebar.button("Build Go Executable"):
+    st.sidebar.write("Attempting to build Go executable...")
+    try:
+        build_process = subprocess.Popen(["go", "build", "-o", "google-maps-scraper"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        build_stdout, build_stderr = build_process.communicate()
+        if build_process.returncode == 0:
+            st.sidebar.success("Go executable built successfully!")
+        else:
+            st.sidebar.error(f"Go build failed with error code {build_process.returncode}")
+            st.sidebar.text("Stderr:")
+            st.sidebar.text(build_stderr.decode())
+    except FileNotFoundError:
+        st.sidebar.error("Error: Go command not found. Make sure Go is installed and in PATH.")
+    except Exception as e:
+        st.sidebar.error(f"An error occurred during Go build: {e}")
+
+if st.sidebar.button("Make Executable"):
+    st.sidebar.write("Attempting to set execute permissions...")
+    try:
+        chmod_process = subprocess.Popen(["chmod", "+x", "./google-maps-scraper"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        chmod_stdout, chmod_stderr = chmod_process.communicate()
+        if chmod_process.returncode == 0:
+            st.sidebar.success("Executable permissions set successfully!")
+        else:
+            st.sidebar.error(f"chmod failed with error code {chmod_process.returncode}")
+            st.sidebar.text("Stderr:")
+            st.sidebar.text(chmod_stderr.decode())
+    except FileNotFoundError:
+        st.sidebar.error("Error: chmod command not found. This command is for Linux/Unix-like systems.")
+    except Exception as e:
+        st.sidebar.error(f"An error occurred during chmod: {e}")
+
+
 if st.button("Start Scraping"):
     st.write(f"Starting scraping for '{query}'...")
 
